@@ -1,0 +1,27 @@
+# ScreenAI — Configuración de ejemplo
+# Copia este archivo como config.toml y agrega tu API key:
+#   cp config.toml.example config.toml
+#   nano config.toml
+
+[api]
+provider = "gemini"
+model    = "gemini-2.5-flash"
+# Consigue tu API key gratis en: https://aistudio.google.com
+api_key  = "PEGA_TU_GEMINI_API_KEY_AQUI"
+
+[capture]
+mode   = "fullscreen"
+output = "/tmp/screenai/screenshot.png"
+
+[tts]
+# Motor de voz: "piper" (alta calidad, local) o "espeak" (siempre disponible)
+engine = "piper"
+# Modelo de voz piper — ver voces disponibles en ~/.local/share/piper/voices/
+voice  = "es_ES-sharvard-medium"
+# Velocidad de habla para espeak (palabras por minuto)
+speed  = 145
+
+[ui]
+# Mostrar preview del texto como notificación mientras habla
+show_notification     = true
+notification_duration = 12000

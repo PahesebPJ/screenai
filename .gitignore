@@ -1,0 +1,38 @@
+# ============================================================
+# ScreenAI — .gitignore
+# ============================================================
+
+# ⚠️  NUNCA subir la configuración con la API key
+config.toml
+
+# Archivos temporales de captura y respuesta
+/tmp/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+
+# Modelos de voz (son grandes, se descargan en install.sh)
+*.onnx
+*.onnx.json
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
