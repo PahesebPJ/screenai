@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ============================================================
 # ScreenAI — Modo Voz Directo
-# Invocado por Super+Shift+V en Hyprland (toggle start/stop)
+# Invocado por Super+V o Super+Shift+V en Hyprland (toggle start/stop)
 #
 # 1. Primera pulsación: Captura pantalla y comienza a grabar micrófono.
 # 2. Segunda pulsación: Detiene grabación, envía audio + pantalla a Gemini
@@ -26,13 +26,20 @@ else
 fi
 
 # ── CASO 1: Si ya está grabando -> Detener, procesar y responder ──
-if [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE" 2>/dev/null)" 2>/dev/null; then
-    REC_PID=$(cat "$PID_FILE")
+if [[ -f "$PID_FILE" ]]; then
+    REC_PID=$(cat "$PID_FILE" 2>/dev/null || echo "")
     rm -f "$PID_FILE"
 
-    # Enviar SIGINT a pw-record para cerrar limpiamente el encabezado WAV
-    kill -2 "$REC_PID" 2>/dev/null || true
-    sleep 0.3
+    if [[ -n "$REC_PID" ]]; then
+        kill -2 "$REC_PID" 2>/dev/null || true
+    fi
+    sleep 0.4
+
+    # Verificar que el archivo de audio exista y tenga datos
+    if [[ ! -s "$AUDIO_FILE" ]]; then
+        notify-send "ScreenAI" "⚠️ Grabación vacía" -u low -t 4000
+        exit 0
+    fi
 
     notify-send "ScreenAI 🤖" "Procesando tu voz y pantalla..." -t 20000 -u low -i dialog-information
 
@@ -76,11 +83,3 @@ REC_PID=$!
 echo "$REC_PID" > "$PID_FILE"
 
 notify-send "ScreenAI 🎙️" "Escuchando... Habla y presiona el atajo de nuevo para enviar." -t 15000 -u normal
-
-# 4. Watchdog de seguridad: Si pasan 25 segundos sin pulsar de nuevo, procesar automáticamente
-(
-    sleep 25
-    if [[ -f "$PID_FILE" ]] && [[ "$(cat "$PID_FILE" 2>/dev/null)" == "$REC_PID" ]]; then
-        /home/alan/.local/bin/screenai-voice
-    fi
-) & disown
