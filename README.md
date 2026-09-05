@@ -28,10 +28,9 @@ Respuesta en voz           ──► 🔊 Piper lee la respuesta y ves una notif
 
 ---
 
-## 📚 Documentación Técnica Detallada
+## 📚 Documentación y Guías
 
-Para una comprensión profunda de la arquitectura y configuración del sistema, consulta los siguientes documentos:
-
+- 📖 **[Guía de Uso Rápido e Instrucciones (`USAGE.md`)](USAGE.md)**: Cómo usar el modo voz y menú, ejemplos prácticos y comandos.
 - 🏛️ **[Arquitectura y Flujo de Datos (`docs/ARCHITECTURE.md`)](docs/ARCHITECTURE.md)**: Diagramas Mermaid, ciclo de vida de procesos, llamadas Wayland e interacción de audio.
 - 🧩 **[Catálogo de Componentes (`docs/COMPONENTS.md`)](docs/COMPONENTS.md)**: Explicación detallada de cada script, parámetros, dependencias y responsabilidades.
 - ⚙️ **[Guía de Configuración y Personalización (`docs/CONFIGURATION.md`)](docs/CONFIGURATION.md)**: Cómo cambiar modelos de Gemini, descargar nuevas voces para Piper, personalizar prompts y atajos de teclado.
@@ -44,6 +43,7 @@ Para una comprensión profunda de la arquitectura y configuración del sistema, 
 ```
 screenai/
 ├── README.md               ← este archivo
+├── USAGE.md                ← guía de uso e instrucciones paso a paso
 ├── docs/                   ← documentación técnica extendida
 │   ├── ARCHITECTURE.md     ← diagramas y flujo de datos
 │   ├── COMPONENTS.md       ← catálogo detallado de scripts
