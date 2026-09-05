@@ -5,7 +5,7 @@
 
 [api]
 provider = "gemini"
-model    = "gemini-2.5-flash"
+model    = "gemini-3.8-flash"
 # Consigue tu API key gratis en: https://aistudio.google.com
 api_key  = "PEGA_TU_GEMINI_API_KEY_AQUI"
 

@@ -36,10 +36,11 @@ def speak_with_piper(text: str, voice_name: str) -> bool:
 
         voice = PiperVoice.load(str(model_path))
         with wave.open(str(wav_path), "w") as wav_file:
-            voice.synthesize(text, wav_file)
+            voice.synthesize_wav(text, wav_file)
 
-        # Intentar reproducir con aplay, paplay o mpv
+        # Intentar reproducir con pw-play (PipeWire nativo), aplay, paplay o mpv
         for player_cmd in [
+            ["pw-play", str(wav_path)],
             ["aplay", "-q", str(wav_path)],
             ["paplay", str(wav_path)],
             ["mpv", "--no-video", "--really-quiet", str(wav_path)],
@@ -51,7 +52,7 @@ def speak_with_piper(text: str, voice_name: str) -> bool:
             except (FileNotFoundError, subprocess.CalledProcessError):
                 continue
 
-        print("[TTS] No se encontró reproductor de audio (aplay/paplay/mpv)", file=sys.stderr)
+        print("[TTS] No se encontró reproductor de audio (pw-play/aplay/paplay/mpv)", file=sys.stderr)
         return False
 
     except ImportError:

@@ -25,7 +25,7 @@ def query_gemini(image_path: str, prompt: str, config: dict) -> str:
     from google.genai import types
 
     api_key = config["api"]["api_key"]
-    model   = config["api"].get("model", "gemini-2.5-flash")
+    primary_model = config["api"].get("model", "gemini-3.8-flash")
 
     client = genai.Client(api_key=api_key)
 
@@ -37,15 +37,29 @@ def query_gemini(image_path: str, prompt: str, config: dict) -> str:
     system_ctx = load_system_prompt()
     full_prompt = f"{system_ctx}\n\nPregunta del usuario: {prompt}" if system_ctx else prompt
 
-    response = client.models.generate_content(
-        model=model,
-        contents=[
-            types.Part.from_bytes(data=image_data, mime_type="image/png"),
-            full_prompt,
-        ]
-    )
+    # Modelos candidatos con fallback automático ante alta demanda (503) o cambio de versión
+    candidate_models = [primary_model]
+    for fallback in ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-flash-latest"]:
+        if fallback not in candidate_models:
+            candidate_models.append(fallback)
 
-    return response.text
+    last_error = None
+    for model_name in candidate_models:
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=[
+                    types.Part.from_bytes(data=image_data, mime_type="image/png"),
+                    full_prompt,
+                ]
+            )
+            if response and response.text:
+                return response.text
+        except Exception as e:
+            last_error = e
+            continue
+
+    raise last_error if last_error else RuntimeError("No se pudo obtener respuesta de Gemini")
 
 
 def main():

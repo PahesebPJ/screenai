@@ -16,17 +16,30 @@ if ! grim "$TMP/screenshot.png" 2>/dev/null; then
     exit 1
 fi
 
-# ── 2. Menú de prompts via wofi ───────────────────────────────
-# Si el usuario escribe algo que no está en la lista, wofi lo
-# devuelve tal cual → funciona como input personalizado también.
-PROMPT=$(cat "$SCREENAI_HOME/prompts.txt" | wofi \
-    --dmenu \
-    --prompt "ScreenAI ✨" \
-    --width 580 \
-    --lines 10 \
-    --insensitive \
-    --style "$SCREENAI_HOME/wofi.css" \
-    2>/dev/null) || exit 0
+# ── 2. Menú de prompts (soporta walker nativo de Omarchy, wofi y rofi) ──
+get_prompt() {
+    if command -v omarchy-launch-walker &>/dev/null; then
+        cat "$SCREENAI_HOME/prompts.txt" | omarchy-launch-walker --dmenu -p "ScreenAI ✨" 2>/dev/null
+    elif command -v walker &>/dev/null; then
+        cat "$SCREENAI_HOME/prompts.txt" | walker --dmenu -p "ScreenAI ✨" 2>/dev/null
+    elif command -v wofi &>/dev/null; then
+        cat "$SCREENAI_HOME/prompts.txt" | wofi \
+            --dmenu \
+            --prompt "ScreenAI ✨" \
+            --width 580 \
+            --lines 10 \
+            --insensitive \
+            --style "$SCREENAI_HOME/wofi.css" \
+            2>/dev/null
+    elif command -v rofi &>/dev/null; then
+        cat "$SCREENAI_HOME/prompts.txt" | rofi -dmenu -p "ScreenAI ✨" 2>/dev/null
+    else
+        notify-send "ScreenAI" "❌ No se encontró lanzador (omarchy-launch-walker, walker, wofi o rofi)" -u critical -t 8000
+        return 1
+    fi
+}
+
+PROMPT=$(get_prompt) || exit 0
 
 [[ -z "$PROMPT" ]] && exit 0
 
