@@ -54,26 +54,36 @@ else
     ok "Dependencias del sistema ya instaladas"
 fi
 
-# ── Paso 3: Dependencias Python ───────────────────────────────
-step "Instalando dependencias Python"
+# ── Paso 3: Entorno Virtual y Dependencias Python ────────────
+step "Configurando entorno virtual de Python"
+VENV_DIR="$INSTALL_DIR/venv"
+if [[ ! -d "$VENV_DIR" ]]; then
+    python3 -m venv "$VENV_DIR"
+    ok "Entorno virtual creado en $VENV_DIR"
+else
+    ok "Entorno virtual existente en $VENV_DIR"
+fi
+
+step "Instalando dependencias Python en el entorno virtual"
+"$VENV_DIR/bin/pip" install --upgrade --quiet pip
 
 # google-genai (cliente oficial de Gemini)
-if ! python3 -c "from google import genai" 2>/dev/null; then
+if ! "$VENV_DIR/bin/python3" -c "from google import genai" 2>/dev/null; then
     echo "  Instalando google-genai..."
-    pip install --quiet google-genai && ok "google-genai instalado" || \
-        warn "No se pudo instalar google-genai (intenta: pip install google-genai)"
+    "$VENV_DIR/bin/pip" install --quiet google-genai && ok "google-genai instalado" || \
+        warn "No se pudo instalar google-genai en el venv"
 else
-    ok "google-genai ya instalado"
+    ok "google-genai ya instalado en el venv"
 fi
 
 # piper-tts (TTS local de alta calidad)
-if ! python3 -c "from piper.voice import PiperVoice" 2>/dev/null && \
+if ! "$VENV_DIR/bin/python3" -c "from piper.voice import PiperVoice" 2>/dev/null && \
    ! command -v piper &>/dev/null; then
     echo "  Instalando piper-tts..."
-    pip install --quiet piper-tts 2>/dev/null && ok "piper-tts instalado" || \
+    "$VENV_DIR/bin/pip" install --quiet piper-tts && ok "piper-tts instalado" || \
         warn "piper-tts no disponible — se usará espeak-ng como TTS"
 else
-    ok "piper-tts ya instalado"
+    ok "piper-tts ya instalado en el venv"
 fi
 
 # ── Paso 4: Modelo de voz español ────────────────────────────

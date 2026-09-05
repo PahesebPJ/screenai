@@ -30,11 +30,18 @@ PROMPT=$(cat "$SCREENAI_HOME/prompts.txt" | wofi \
 
 [[ -z "$PROMPT" ]] && exit 0
 
+# ── Determinar intérprete de Python (venv prioritario) ────────
+if [[ -x "$SCREENAI_HOME/venv/bin/python3" ]]; then
+    PYTHON_BIN="$SCREENAI_HOME/venv/bin/python3"
+else
+    PYTHON_BIN="python3"
+fi
+
 # ── 3. Notificación de estado ─────────────────────────────────
 notify-send "ScreenAI" "🤖 Consultando Gemini..." -t 20000 -u low -i dialog-information
 
 # ── 4. Consultar Gemini multimodal ────────────────────────────
-if ! python3 "$SCREENAI_HOME/screenai_query.py" \
+if ! "$PYTHON_BIN" "$SCREENAI_HOME/screenai_query.py" \
         "$TMP/screenshot.png" \
         "$PROMPT" \
         "$CONF_DIR/config.toml" \
@@ -50,6 +57,6 @@ PREVIEW=$(head -c 220 "$TMP/response.txt" | tr '\n' ' ')
 notify-send "ScreenAI" "💬 $PREVIEW" -t 12000
 
 # ── 6. Respuesta por voz (TTS) ────────────────────────────────
-python3 "$SCREENAI_HOME/screenai_tts.py" \
+"$PYTHON_BIN" "$SCREENAI_HOME/screenai_tts.py" \
     "$TMP/response.txt" \
     "$CONF_DIR/config.toml"
