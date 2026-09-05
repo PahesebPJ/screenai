@@ -20,11 +20,27 @@ Super+Shift+S
 
 ---
 
+## 📚 Documentación Técnica Detallada
+
+Para una comprensión profunda de la arquitectura y configuración del sistema, consulta los siguientes documentos:
+
+- 🏛️ **[Arquitectura y Flujo de Datos (`docs/ARCHITECTURE.md`)](docs/ARCHITECTURE.md)**: Diagramas Mermaid, ciclo de vida de procesos, llamadas Wayland e interacción de audio.
+- 🧩 **[Catálogo de Componentes (`docs/COMPONENTS.md`)](docs/COMPONENTS.md)**: Explicación detallada de cada script, parámetros, dependencias y responsabilidades.
+- ⚙️ **[Guía de Configuración y Personalización (`docs/CONFIGURATION.md`)](docs/CONFIGURATION.md)**: Cómo cambiar modelos de Gemini, descargar nuevas voces para Piper, personalizar prompts y atajos de teclado.
+- 🛠️ **[Diagnóstico y Resolución de Problemas (`docs/TROUBLESHOOTING.md`)](docs/TROUBLESHOOTING.md)**: Pruebas unitarias en una sola línea, errores comunes y soluciones para audio y Wayland.
+
+---
+
 ## 📁 Estructura del Repositorio
 
 ```
 screenai/
 ├── README.md               ← este archivo
+├── docs/                   ← documentación técnica extendida
+│   ├── ARCHITECTURE.md     ← diagramas y flujo de datos
+│   ├── COMPONENTS.md       ← catálogo detallado de scripts
+│   ├── CONFIGURATION.md    ← personalización de modelos, voces y atajos
+│   └── TROUBLESHOOTING.md  ← resolución de problemas y pruebas
 ├── .gitignore              ← excluye config.toml (contiene API key)
 ├── install.sh              ← instalador automático
 │
