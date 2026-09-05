@@ -16,7 +16,18 @@ mkdir -p "$TMP"
 
 PID_FILE="$TMP/recording.pid"
 AUDIO_FILE="$TMP/voice_prompt.wav"
-SCREENSHOT_FILE="$TMP/screenshot.png"
+SCREENSHOT_FILE="$TMP/screenshot.jpg"
+LOCK_FILE="$TMP/voice.lock"
+
+# ── Anti-rebote / Debounce (ignorar pulsaciones repetidas < 500ms) ──
+NOW=$(date +%s%N 2>/dev/null | cut -b1-13 || date +%s)
+LAST_TIME=$(cat "$LOCK_FILE" 2>/dev/null || echo 0)
+DIFF=$((NOW - LAST_TIME))
+
+if [[ $DIFF -lt 500 ]] && [[ $DIFF -ge 0 ]]; then
+    exit 0
+fi
+echo "$NOW" > "$LOCK_FILE"
 
 # Determinar intérprete de Python (venv prioritario)
 if [[ -x "$SCREENAI_HOME/venv/bin/python3" ]]; then
@@ -33,11 +44,16 @@ if [[ -f "$PID_FILE" ]]; then
     if [[ -n "$REC_PID" ]]; then
         kill -2 "$REC_PID" 2>/dev/null || true
     fi
-    sleep 0.4
+    sleep 0.2
 
-    # Verificar que el archivo de audio exista y tenga datos
-    if [[ ! -s "$AUDIO_FILE" ]]; then
-        notify-send "ScreenAI" "⚠️ Grabación vacía" -u low -t 4000
+    # Sonido sutil de confirmación al detener grabación
+    canberra-gtk-play -i audio-volume-change 2>/dev/null || true
+
+    # Verificar que el archivo de audio exista y tenga contenido (> 4000 bytes = ~0.25s)
+    AUDIO_SIZE=$(stat -c%s "$AUDIO_FILE" 2>/dev/null || echo 0)
+    if [[ ! -s "$AUDIO_FILE" ]] || [[ "$AUDIO_SIZE" -lt 4000 ]]; then
+        notify-send "ScreenAI" "⚠️ Grabación demasiado corta" -u low -t 3000
+        rm -f "$AUDIO_FILE"
         exit 0
     fi
 
@@ -68,10 +84,10 @@ if [[ -f "$PID_FILE" ]]; then
 fi
 
 # ── CASO 2: Si no está grabando -> Capturar pantalla y grabar micrófono ──
-# 1. Capturar pantalla inmediatamente en el momento en que se activa
-if ! grim "$SCREENSHOT_FILE" 2>/dev/null; then
-    notify-send "ScreenAI" "❌ Error al capturar la pantalla (grim)" -u critical -t 5000
-    exit 1
+# 1. Capturar pantalla inmediatamente en formato JPEG ligero y rápido (calidad 80)
+if ! grim -t jpeg -q 80 "$SCREENSHOT_FILE" 2>/dev/null; then
+    # Fallback a PNG si la versión de grim no soporta JPEG
+    grim "$SCREENSHOT_FILE" 2>/dev/null || true
 fi
 
 # 2. Limpiar grabación anterior
@@ -81,5 +97,8 @@ rm -f "$AUDIO_FILE" "$PID_FILE"
 pw-record --rate 16000 --channels 1 "$AUDIO_FILE" &
 REC_PID=$!
 echo "$REC_PID" > "$PID_FILE"
+
+# Sonido sutil de confirmación al iniciar escucha
+canberra-gtk-play -i audio-volume-change 2>/dev/null || true
 
 notify-send "ScreenAI 🎙️" "Escuchando... Habla y presiona el atajo de nuevo para enviar." -t 15000 -u normal

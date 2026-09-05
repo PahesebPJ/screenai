@@ -27,13 +27,18 @@ def query_gemini(image_path: str, prompt_or_audio: str, config: dict, is_voice: 
     api_key = config["api"]["api_key"]
     primary_model = config["api"].get("model", "gemini-3.8-flash")
 
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(retry_options=types.HttpRetryOptions(attempts=1))
+    )
 
     # Leer imagen
     with open(image_path, "rb") as f:
         image_data = f.read()
 
-    contents = [types.Part.from_bytes(data=image_data, mime_type="image/png")]
+    # Detectar formato de imagen (JPEG o PNG)
+    mime_type = "image/jpeg" if str(image_path).lower().endswith((".jpg", ".jpeg")) else "image/png"
+    contents = [types.Part.from_bytes(data=image_data, mime_type=mime_type)]
 
     system_ctx = load_system_prompt()
 
@@ -51,9 +56,15 @@ def query_gemini(image_path: str, prompt_or_audio: str, config: dict, is_voice: 
         full_prompt = f"{system_ctx}\n\nPregunta del usuario: {prompt_or_audio}" if system_ctx else prompt_or_audio
         contents.append(full_prompt)
 
-    # Modelos candidatos con fallback automático ante alta demanda (503) o cambio de versión
+    # Modelos candidatos con rotación de cuota ante 429 (Resource Exhausted) o 503 (Alta Demanda)
     candidate_models = [primary_model]
-    for fallback in ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-flash-latest"]:
+    for fallback in [
+        "gemini-3.5-flash-lite",
+        "gemini-3-flash-preview",
+        "gemini-3.7-flash",
+        "gemini-3.8-flash",
+        "gemini-flash-latest"
+    ]:
         if fallback not in candidate_models:
             candidate_models.append(fallback)
 

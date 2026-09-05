@@ -10,10 +10,9 @@ CONF_DIR="$HOME/.config/screenai"
 TMP="/tmp/screenai"
 mkdir -p "$TMP"
 
-# ── 1. Captura de pantalla completa (silenciosa) ──────────────
-if ! grim "$TMP/screenshot.png" 2>/dev/null; then
-    notify-send "ScreenAI" "❌ Error al capturar la pantalla" -u critical -t 5000
-    exit 1
+# ── 1. Captura de pantalla completa rápida (JPEG q80) ──────────
+if ! grim -t jpeg -q 80 "$TMP/screenshot.jpg" 2>/dev/null; then
+    grim "$TMP/screenshot.jpg" 2>/dev/null || true
 fi
 
 # ── 2. Menú de prompts (soporta walker nativo de Omarchy, wofi y rofi) ──
@@ -55,7 +54,7 @@ notify-send "ScreenAI" "🤖 Consultando Gemini..." -t 20000 -u low -i dialog-in
 
 # ── 4. Consultar Gemini multimodal ────────────────────────────
 if ! "$PYTHON_BIN" "$SCREENAI_HOME/screenai_query.py" \
-        "$TMP/screenshot.png" \
+        "$TMP/screenshot.jpg" \
         "$PROMPT" \
         "$CONF_DIR/config.toml" \
         > "$TMP/response.txt" 2>"$TMP/error.txt"; then
