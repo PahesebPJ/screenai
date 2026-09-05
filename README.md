@@ -3,19 +3,27 @@
 > Presiona un atajo → Gemini analiza tu pantalla → te responde en voz
 
 Asistente visual de escritorio para **Arch Linux / Omarchy (Hyprland + Wayland)**.  
-Captura la pantalla completa, la envía a **Google Gemini 2.5 Flash** junto con tu pregunta, y lee la respuesta en voz alta usando **piper TTS**.
+Captura la pantalla completa, la envía a **Google Gemini Flash** junto con tu pregunta (por texto o hablando por tu micrófono), y lee la respuesta en voz alta usando **piper TTS**.
 
 ---
 
-## ✨ ¿Cómo funciona?
+## ✨ Modos de Uso y Atajos
 
+ScreenAI ofrece dos modos complementarios:
+
+### 1. 🎙️ Modo Voz Directo (¡Sin menús!) — `Super + V` o `Super + Shift + V`
 ```
-Super+Shift+S
-     │
-     ├─► grim captura pantalla completa
-     ├─► wofi muestra menú de prompts
-     ├─► Gemini 2.5 Flash analiza imagen + prompt
-     └─► piper lee la respuesta en voz alta
+Presiona Super + V  ──► Captura pantalla y empieza a grabar tu micrófono
+Hablas tu pregunta  ──► "Explica qué error tengo aquí en la terminal"
+Vuelves a presionar ──► Detiene grabación, manda pantalla + audio a Gemini
+Respuesta en voz    ──► 🔊 Piper lee la solución directamente a tus auriculares
+```
+
+### 2. 📋 Modo Menú Visual — `Super + Shift + S`
+```
+Presiona Super + Shift + S ──► Captura pantalla y abre el menú Walker de Omarchy
+Eliges un prompt o escribes ──► "¿Qué hay en pantalla?", "Traduce", etc.
+Respuesta en voz           ──► 🔊 Piper lee la respuesta y ves una notificación
 ```
 
 ---

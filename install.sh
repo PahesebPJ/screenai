@@ -112,11 +112,12 @@ fi
 # ── Paso 5: Copiar archivos del proyecto ──────────────────────
 step "Instalando archivos de ScreenAI"
 cp "$SCRIPT_DIR/screenai.sh"       "$INSTALL_DIR/screenai.sh"
+cp "$SCRIPT_DIR/screenai_voice.sh" "$INSTALL_DIR/screenai_voice.sh"
 cp "$SCRIPT_DIR/screenai_query.py" "$INSTALL_DIR/screenai_query.py"
 cp "$SCRIPT_DIR/screenai_tts.py"   "$INSTALL_DIR/screenai_tts.py"
 cp "$SCRIPT_DIR/prompts.txt"       "$INSTALL_DIR/prompts.txt"
 cp "$SCRIPT_DIR/wofi.css"          "$INSTALL_DIR/wofi.css"
-chmod +x "$INSTALL_DIR/screenai.sh"
+chmod +x "$INSTALL_DIR/screenai.sh" "$INSTALL_DIR/screenai_voice.sh"
 ok "Scripts copiados a $INSTALL_DIR"
 
 # ── Paso 6: Configuración ─────────────────────────────────────
@@ -137,7 +138,8 @@ ok "system_prompt.txt actualizado"
 
 # ── Paso 7: Symlink en PATH ───────────────────────────────────
 ln -sf "$INSTALL_DIR/screenai.sh" "$BIN_DIR/screenai"
-ok "Symlink creado: $BIN_DIR/screenai"
+ln -sf "$INSTALL_DIR/screenai_voice.sh" "$BIN_DIR/screenai-voice"
+ok "Symlinks creados: $BIN_DIR/screenai y $BIN_DIR/screenai-voice"
 
 # Verificar que $BIN_DIR está en PATH
 if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
